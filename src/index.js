@@ -1,6 +1,7 @@
 // iniciando projeto
 const express = require('express');
 const bodyParser = require('body-parser');
+const getTalkers = require('./getTalkers');
 
 const app = express();
 app.use(bodyParser.json());
@@ -15,4 +16,16 @@ app.get('/', (_request, response) => {
 
 app.listen(PORT, () => {
   console.log('Online');
+});
+
+app.use(express.json());
+
+app.get('/talker', async (req, res) => {
+  console.log('executou');
+  try {
+    const talkers = await getTalkers();
+    res.status(200).send(talkers);
+  } catch ({ message }) { 
+    res.status(500).send({ message });
+  }
 });
