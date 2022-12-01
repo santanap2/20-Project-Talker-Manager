@@ -97,3 +97,10 @@ async (req, res) => {
   await createTalker(JSON.stringify(talkers, null, 2));
   res.status(200).json(talkers[index]);
 });
+
+app.delete('/talker/:id', tokenValidation, async (req, res) => {
+  const talkers = await getTalkers();
+  const remainingTalkers = talkers.filter((item) => item.id !== Number(req.params.id));
+  await createTalker(JSON.stringify(remainingTalkers, null, 2));
+  return res.status(204).json({ message: 'Pessoa palestrante deletada com sucesso' });
+});
