@@ -18,14 +18,25 @@ app.listen(PORT, () => {
   console.log('Online');
 });
 
-app.use(express.json());
-
 app.get('/talker', async (req, res) => {
-  console.log('executou');
   try {
     const talkers = await getTalkers();
     res.status(200).send(talkers);
   } catch ({ message }) { 
+    res.status(500).send({ message });
+  }
+});
+
+app.get('/talker/:id', async (req, res) => {
+  try {
+    const talkers = await getTalkers();
+    const talkerID = talkers.find((one) => one.id === Number(req.params.id));
+    if (!talkerID) {
+      return res.status(404).send({ message: 'Pessoa palestrante não encontrada' });
+    } 
+
+    res.status(200).json(talkerID);
+  } catch ({ message }) {
     res.status(500).send({ message });
   }
 });
