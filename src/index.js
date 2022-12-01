@@ -12,6 +12,7 @@ const {
   talkValidation,
   watchedValidation,
   rateValidation,
+  currentIdValidation,
  } = require('./middlewares/talkerValidations');
 
 const app = express();
@@ -77,4 +78,22 @@ async (req, res) => {
   const all = JSON.stringify([...talkers, createdTalker], null, 2);
   await createTalker(all);
   res.status(201).json(createdTalker);
+});
+
+app.put('/talker/:id', 
+tokenValidation,
+nameValidation,
+ageValidation,
+talkValidation,
+watchedValidation,
+rateValidation,
+currentIdValidation,
+async (req, res) => {
+  const talkers = await getTalkers();
+  const { name, age, talk } = req.body;
+  const { id } = req.params;
+  const index = talkers.findIndex((one) => one.id === Number(id));
+  talkers[index] = { id: Number(id), name, age, talk };
+  await createTalker(JSON.stringify(talkers, null, 2));
+  res.status(200).json(talkers[index]);
 });

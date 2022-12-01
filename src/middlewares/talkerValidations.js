@@ -1,3 +1,5 @@
+const getTalkers = require('../utils/getTalkers');
+
 const tokenValidation = (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization) {
@@ -53,13 +55,23 @@ const watchedValidation = (req, res, next) => {
   next();
 };
 
+const validation = (item) => !item && item !== 0;
+
 const rateValidation = (req, res, next) => {
   const { rate } = req.body.talk;
-  if (!rate) {
+  if (validation(rate)) {
     return res.status(400).json({ message: 'O campo "rate" é obrigatório' });
   }
   if (Number(rate) < 1 || Number(rate) > 5 || !Number.isInteger(Number(rate))) {
     return res.status(400).json({ message: 'O campo "rate" deve ser um inteiro de 1 à 5' });
+  }
+  next();
+};
+
+const currentIdValidation = async (req, res, next) => {
+  const talkers = await getTalkers();
+  if (talkers.some((one) => one.id === req.params.id)) {
+    return res.status(400).json({ message: ' Pessoa palestrante não encontrada' });
   }
   next();
 };
@@ -71,4 +83,5 @@ module.exports = {
   talkValidation,
   watchedValidation,
   rateValidation,
+  currentIdValidation,
 };
