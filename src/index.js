@@ -2,11 +2,21 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
-const getTalkers = require('./getTalkers');
+const getTalkers = require('./utils/getTalkers');
+const createTalker = require('./utils/createTalker');
 const { emailValidation, passwordValidation } = require('./middlewares/loginValidations');
+const {
+  tokenValidation,
+  nameValidation,
+  ageValidation,
+  talkValidation,
+  watchedValidation,
+  rateValidation,
+ } = require('./middlewares/talkerValidations');
 
 const app = express();
 app.use(bodyParser.json());
+app.use(express.json());
 
 const HTTP_OK_STATUS = 200;
 const PORT = '3000';
@@ -50,4 +60,21 @@ app.post('/login', emailValidation, passwordValidation, (req, res) => {
   } catch ({ message }) {
     res.status(500).send({ message });
   }
+});
+
+app.post('/talker', 
+tokenValidation,
+nameValidation,
+ageValidation,
+talkValidation,
+watchedValidation,
+rateValidation,
+async (req, res) => {
+  const { name, age, talk } = req.body;
+  const talkers = await getTalkers();
+  const id = Number(talkers[talkers.length - 1].id) + 1;
+  const createdTalker = { name, id, age, talk };
+  const all = JSON.stringify([...talkers, createdTalker], null, 2);
+  await createTalker(all);
+  res.status(201).json(createdTalker);
 });
