@@ -40,6 +40,16 @@ app.get('/talker', async (req, res) => {
   }
 });
 
+app.get('/talker/search', tokenValidation, async (req, res) => {
+  const { q } = req.query;
+  const talkers = await getTalkers();
+  if (!q) {
+    return res.status(200).json(talkers);
+  }
+  const resultTalkers = talkers.filter((talker) => talker.name.includes(q));
+  return res.status(200).json(resultTalkers);
+});
+
 app.get('/talker/:id', async (req, res) => {
   try {
     const talkers = await getTalkers();
