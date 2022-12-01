@@ -1,6 +1,7 @@
 // iniciando projeto
 const express = require('express');
 const bodyParser = require('body-parser');
+const crypto = require('crypto');
 const getTalkers = require('./getTalkers');
 
 const app = express();
@@ -36,6 +37,16 @@ app.get('/talker/:id', async (req, res) => {
     } 
 
     res.status(200).json(talkerID);
+  } catch ({ message }) {
+    res.status(500).send({ message });
+  }
+});
+
+app.post('/login', (req, res) => {
+  try {
+    const token = crypto.randomBytes(8).toString('hex');
+    console.log(token);
+    res.status(200).json({ token });
   } catch ({ message }) {
     res.status(500).send({ message });
   }
